@@ -86,20 +86,27 @@ const TheBlueShrewHome = () => {
 
 
         {/* Order Button */}
-        <section className="py-12 text-center">
+         {/* <section className="py-12 text-center">
           <a 
             href="https://forms.gle/1gausKVBXAyJVxD56" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-lg text-lg transition duration-300 inline-block"
           >
-            Order Now
+            Orders Opening Soon
           </a>
+        </section>  */}
+
+        {/* Brand Slogan */}
+        <section className="py-12 text-center">
+          <h2 className="text-3xl font-light bold text-blue-200">
+            Orders Opening Soon :)
+          </h2>
         </section>
 
         {/* Footer */}
         <footer className="bg-blue-950 text-blue-200 py-8 text-center">
-          <p>© {new Date().getFullYear()} TheBlueShrew. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} TheBlueShrew</p>
         </footer>
       </div>
     </>
