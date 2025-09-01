@@ -24,14 +24,14 @@ interface CartState {
 // Define the actions for the reducer
 
 type CartAction =
-  | { type: 'ADD_ITEM'; item: Omit<CartItem, 'quantity'>; size: string }
+  | { type: 'ADD_ITEM'; item: Omit<CartItem, 'quantity' | 'size'>; size: string }
   | { type: 'REMOVE_ITEM'; id: number; size: string }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
 
 // ✅ Fix function signatures in the context shape
 const CartContext = createContext<{
   state: CartState;
-  addItem: (item: Omit<CartItem, 'quantity'>, size: string) => void;
+  addItem: (item: Omit<CartItem, 'quantity' | 'size'>, size: string) => void;
   removeItem: (id: number, size: string) => void;
   clearCart: () => void;
 } | null>(null);
@@ -96,7 +96,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], totalQuantity: 0 });
 
-  const addItem = (item: Omit<CartItem, 'quantity'>, size: string) => {
+  const addItem = (item: Omit<CartItem, 'quantity' | 'size'>, size: string) => {
+
     const itemKey = `${item.id}-${size}`;
     const existingItem = state.items.find(i => 
       `${i.id}-${i.size}` === itemKey

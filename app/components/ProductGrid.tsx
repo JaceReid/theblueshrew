@@ -30,7 +30,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({ shirts }) => {
       alert('Please select a size before adding to cart');
       return;
     }
-    addItem(shirt, size);
+    addItem(shirt, size );
+
   };
 
   return (

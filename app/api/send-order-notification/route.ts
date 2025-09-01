@@ -1,32 +1,49 @@
-export const onRequestPost: PagesFunction = async ({ request, env }) => {
-  const { orderDetails, customerInfo, totalAmount, referenceNumber } = await request.json();
+import { NextRequest, NextResponse } from 'next/server';
 
-  const itemsHtml = (orderDetails || [])
-    .map((it: any) => `<li>${it.name} (${it.size}) × ${it.quantity} — ${it.price}</li>`)
-    .join("");
+export const runtime = 'edge';         // important for Cloudflare Workers
+export const dynamic = 'force-dynamic'; // avoids unwanted static optimization
 
-  const html = `
-    <h2>New order: ${referenceNumber}</h2>
-    <p><strong>${customerInfo.firstName} ${customerInfo.lastName}</strong><br/>
-       ${customerInfo.email} · ${customerInfo.phone || "-"}</p>
-    <p><strong>Total: R${totalAmount}</strong></p>
-    <ul>${itemsHtml}</ul>`;
+type OrderItem = { name: string; size: string; quantity: number; price: string };
+type CustomerInfo = { firstName: string; lastName: string; email: string; phone?: string };
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      // IMPORTANT: from must be on your verified domain/subdomain
-      from: "TheBlueShrew <orders@theblueshrew.co.za>",
-      to: ["theblueshreww@gmail.com"],
-      subject: `New order ${referenceNumber}`,
-      html,
-    }),
-  });
+export async function POST(req: NextRequest) {
+  try {
+    const { orderDetails, customerInfo } = (await req.json()) as {
+      orderDetails: OrderItem[];
+      customerInfo: CustomerInfo;
+    };
 
-  if (!res.ok) return new Response(await res.text(), { status: 500 });
-  return new Response(JSON.stringify({ ok: true }), { status: 200 });
-};
+    const apiKey = process.env.RESEND_API_KEY; // set in Cloudflare Pages → Settings → Environment variables (Preview)
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Missing RESEND_API_KEY' }, { status: 500 });
+    }
+
+    // Example: send with Resend via fetch (works on Edge)
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Blueshrew <no-reply@theblueshrew.co.za>',
+        to: ['theblueshreww@gmail.com'],
+        subject: `New order from ${customerInfo.firstName} ${customerInfo.lastName}`,
+        html: `
+          <h3>New order</h3>
+          <p>Customer: ${customerInfo.firstName} ${customerInfo.lastName} (${customerInfo.email})</p>
+          <pre>${JSON.stringify(orderDetails, null, 2)}</pre>
+        `,
+      }),
+    });
+
+    if (!r.ok) {
+      const msg = await r.text();
+      return NextResponse.json({ error: 'Email send failed', details: msg }, { status: 502 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: 'Bad request', details: String(err) }, { status: 400 });
+  }
+}
