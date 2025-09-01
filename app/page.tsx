@@ -11,7 +11,8 @@ const TheBlueShrewHome = () => {
   const shirts = [
     { id: 1, name: "Shrew Crew", price: "R400", image: "/designs/shrewcrew.png" },
     { id: 2, name: "Hangdog",   price: "R400", image: "/designs/hangdog.png" },
-    { id: 3, name: "Quanacho",  price: "R400", image: "/designs/lama.png"   },
+    { id: 3, name: "Guanaco",  price: "R400", image: "/designs/lama.png"   },
+    { id: 4, name: "test",  price: "R399.99", image: "/designs/test.jpg"   },
   ];
 
   return (
