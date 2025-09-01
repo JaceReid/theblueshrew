@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     };
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY!;
-    const FROM_EMAIL = process.env.FROM_EMAIL || 'The Blue Shrew <orders@yourdomain.tld>'; // set this in Cloudflare
+    const FROM_EMAIL = process.env.FROM_EMAIL || 'The Blue Shrew <orders@theblueshrew.co.za>'; // set this in Cloudflare
 
     if (!RESEND_API_KEY) {
       return new Response(JSON.stringify({ error: 'Missing RESEND_API_KEY' }), { status: 500 });
